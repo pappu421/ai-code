@@ -119,53 +119,40 @@ if __name__ == "__main__":
 
 ==================================
 Water Jug
-from collections import deque
+from collections import defaultdict
 
-def water_jug_BFS(x, y, z):
-    visited = set()
-    queue = deque([(0, 0)])
-    
-    while queue:
-        jug_a, jug_b = queue.popleft()
-        
-        if jug_a == z or jug_b == z or jug_a + jug_b == z:
-            return True
-      if (jug_a, jug_b) in visited:
-            continue
-       visited.add((jug_a, jug_b))
-        # Fill jug A
-        if jug_a < x:
+jug1, jug2, aim = 4, 3, 2
 
-                queue.append((x, jug_b))
-        # Fill jug B
-        if jug_b < y:
-                queue.append((jug_a, y))
-        # Empty jug A
-        if jug_a > 0:
-                queue.append((0, jug_b))
-        
-        # Empty jug B
-        if jug_b > 0:
-            queue.append((jug_a, 0))
-        
-        # Pour from A to B
-        if jug_a + jug_b >= y:
-            queue.append((jug_a - (y - jug_b), y))
-        else:
-            queue.append((0, jug_a + jug_b))  
-        # Pour from B to A
-        if jug_a + jug_b >= x:
-            queue.append((x, jug_b - (x - jug_a)))
-        else:
-            queue.append((jug_a + jug_b, 0))
-    return False
-x = 2
-y = 1 
-z = 4 
-if water_jug_BFS(x, y, z):
-    print(f'You can measure {z} liters of water using {x}-liter and {y}-liter jugs.')
-else:
-    print(f'You cannot measure {z} liters of water using {x}-liter and {y}-liter jugs.')
+visited = defaultdict(lambda: False)
+
+def waterJugSolver(amt1, amt2):
+
+    if (amt1 == aim and amt2 == 0) or (amt2 == aim and amt1 == 0):
+        print(amt1, amt2)
+        return True
+
+    if visited[(amt1, amt2)] == False:
+        print(amt1, amt2)
+
+
+        visited[(amt1, amt2)] = True
+
+
+        return (waterJugSolver(0, amt2) or
+                waterJugSolver(amt1, 0) or
+                waterJugSolver(jug1, amt2) or
+                waterJugSolver(amt1, jug2) or
+                waterJugSolver(amt1 + min(amt2, (jug1-amt1)),
+                amt2 - min(amt2, (jug1-amt1))) or
+                waterJugSolver(amt1 - min(amt1, (jug2-amt2)),
+                amt2 + min(amt1, (jug2-amt2))))
+
+
+    else:
+        return False
+
+print("Steps: ")
+waterJugSolver(0, 0)
 
 
 
