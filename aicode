@@ -1,4 +1,3 @@
-===========================================
 8 PUZZLE
 import sys
 import copy	
@@ -198,7 +197,7 @@ print(min(dst))
 
 
 ==================================
-BFS 
+Br FS 
 import sys
 import copy
 q = []
@@ -655,62 +654,194 @@ print("Number of mislabeled points out of a total points :", ((y_test != y_pred)
 
 
 ==================================
-BEST F S
-from queue import PriorityQueue
-v = 14
-graph = [[] for i in range(v)]
- 
-# Function For Implementing Best First Search
-# Gives output path having lowest cost
- 
- 
-def best_first_search(actual_Src, target, n):
-    visited = [False] * n
-    pq = PriorityQueue()
-    pq.put((0, actual_Src))
-    visited[actual_Src] = True
-     
-    while pq.empty() == False:
-        u = pq.get()[1]
-        # Displaying the path having lowest cost
-        print(u, end=" ")
-        if u == target:
-            break
- 
-        for v, c in graph[u]:
-            if visited[v] == False:
-                visited[v] = True
-                pq.put((c, v))
-    print()
- 
-# Function for adding edges to graph
- 
- 
-def addedge(x, y, cost):
-    graph[x].append((y, cost))
-    graph[y].append((x, cost))
- 
- 
-# The nodes shown in above example(by alphabets) are
-# implemented using integers addedge(x,y,cost);
-addedge(0, 1, 3)
-addedge(0, 2, 6)
-addedge(0, 3, 5)
-addedge(1, 4, 9)
-addedge(1, 5, 8)
-addedge(2, 6, 12)
-addedge(2, 7, 14)
-addedge(3, 8, 7)
-addedge(8, 9, 5)
-addedge(8, 10, 6)
-addedge(9, 11, 1)
-addedge(9, 12, 10)
-addedge(9, 13, 2)
- 
-source = 0
-target = 9
-best_first_search(source, target, v)
- 
+B F S
+import sys
+import copy
+
+curr_min = sys.maxsize
+q = []
+visited = []
+
+def compare(s,g):
+    if s==g:
+        return(1)
+    else:
+        return(0)
+
+def find_pos(s):
+
+    for i in range(3):
+        for j in range(3):
+            if s[i][j] == 0:
+                return([i,j])
+
+
+def up(s,pos):
+
+    i = pos[0]
+    j = pos[1]
+
+    if i > 0:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i-1][j]
+        temp[i-1][j] = 0
+        return (temp)
+    else:
+        return (s)
+
+
+def down(s,pos):
+
+    i = pos[0]
+    j = pos[1]
+
+    if i < 2:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i+1][j]
+        temp[i+1][j] = 0
+        return (temp)
+    else:
+        return (s)
+
+
+def right(s,pos):
+
+    i = pos[0]
+    j = pos[1]
+
+    if j < 2:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i][j+1]
+        temp[i][j+1] = 0
+        return (temp)
+    else:
+        return (s)
+
+
+def left(s,pos):
+
+    i = pos[0]
+    j = pos[1]
+
+    if j > 0:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i][j-1]
+        temp[i][j-1] = 0
+        return (temp)
+    else:
+        return (s)
+
+def enqueue(s):
+    global q
+    q = q + [s]
+
+def heuristic(s,g):
+    d = 0
+    for i in range(len(s)):
+        for j in range(len(s[0])):
+            if s[i][j] != g[i][j]:
+                d += 1
+    return d
+
+
+def dequeue(g):
+
+    h = []
+    global q
+    global visited
+    global curr_min
+
+    for i in range(len(q)):
+        h = h + [heuristic(q[i],g)]
+
+    if min(h) < curr_min:
+        curr_min = min(h)
+        index = h.index(min(h))
+        visited = visited + [q[index]]
+        elem = q[index]
+        q = []
+        return (elem)
+    else:
+        print ("optimal solution found !! The intermediate states are: ")
+        print (visited)
+        exit()
+
+
+
+
+def search(s,g):
+
+    curr_state = copy.deepcopy(s)
+    if s == g:
+        return
+
+    global visited
+    while(1):
+
+        pos = find_pos(curr_state)
+        new = up(curr_state,pos)
+
+        if new != curr_state:
+            if new == g:
+                print ("Goal State found !! The intermediate States are :")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new)
+
+
+        new = down(curr_state,pos)
+
+        if new != curr_state:
+            if new == g:
+                print ("Goal State found !! The intermediate States are :")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new)
+
+        new = right(curr_state,pos)
+
+        if new != curr_state:
+            if new == g:
+                print ("Goal State found !! The intermediate States are :")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new)
+
+        new = left(curr_state,pos)
+
+        if new != curr_state:
+            if new == g:
+                print ("Goal State found !! The intermediate States are :")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new)
+
+        if len(q) > 0:
+            curr_state = dequeue(g)
+        else:
+            print ("not found")
+            return
+
+
+def main():
+    s = [[2,8,3],[1,5,4],[7,6,0]]
+    g = [[1,2,7],[8,0,5],[3,4,6]]
+    global q
+    global visited
+    q = q + [s]
+    visited = visited + [s]
+    search(s,g)
+
+if __name__ == "__main__":
+    main() 
 
 
 
@@ -731,196 +862,181 @@ best_first_search(source, target, v)
 ================================== 
 A*
 
-# Python program for A* Search Algorithm
-import math
-import heapq
+import sys
+import copy
 
-# Define the Cell class
+q = []
+visited = []
 
+def compare(s,g):
+    if s==g:
+        return(1)
+    else:
+        return(0)
 
-class Cell:
-    def __init__(self):
-      # Parent cell's row index
-        self.parent_i = 0
-    # Parent cell's column index
-        self.parent_j = 0
- # Total cost of the cell (g + h)
-        self.f = float('inf')
-    # Cost from start to this cell
-        self.g = float('inf')
-    # Heuristic cost from this cell to destination
-        self.h = 0
+def find_pos(s):
 
-
-# Define the size of the grid
-ROW = 9
-COL = 10
-
-# Check if a cell is valid (within the grid)
+    for i in range(len(s)):
+        for j in range(len(s[0])):
+            if s[i][j] == 0:
+                return([i,j])
 
 
-def is_valid(row, col):
-    return (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
+def up(s,pos):
 
-# Check if a cell is unblocked
+    i = pos[0]
+    j = pos[1]
 
-
-def is_unblocked(grid, row, col):
-    return grid[row][col] == 1
-
-# Check if a cell is the destination
-
-
-def is_destination(row, col, dest):
-    return row == dest[0] and col == dest[1]
-
-# Calculate the heuristic value of a cell (Euclidean distance to destination)
+    if i > 0:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i-1][j]
+        temp[i-1][j] = 0
+        return (temp)
+    else:
+        return (s)
 
 
-def calculate_h_value(row, col, dest):
-    return ((row - dest[0]) ** 2 + (col - dest[1]) ** 2) ** 0.5
+def down(s,pos):
 
-# Trace the path from source to destination
+    i = pos[0]
+    j = pos[1]
 
-
-def trace_path(cell_details, dest):
-    print("The Path is ")
-    path = []
-    row = dest[0]
-    col = dest[1]
-
-    # Trace the path from destination to source using parent cells
-    while not (cell_details[row][col].parent_i == row and cell_details[row][col].parent_j == col):
-        path.append((row, col))
-        temp_row = cell_details[row][col].parent_i
-        temp_col = cell_details[row][col].parent_j
-        row = temp_row
-        col = temp_col
-
-    # Add the source cell to the path
-    path.append((row, col))
-    # Reverse the path to get the path from source to destination
-    path.reverse()
-
-    # Print the path
-    for i in path:
-        print("->", i, end=" ")
-    print()
-
-# Implement the A* search algorithm
+    if i < 2:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i+1][j]
+        temp[i+1][j] = 0
+        return (temp)
+    else:
+        return (s)
 
 
-def a_star_search(grid, src, dest):
-    # Check if the source and destination are valid
-    if not is_valid(src[0], src[1]) or not is_valid(dest[0], dest[1]):
-        print("Source or destination is invalid")
+def right(s,pos):
+
+    i = pos[0]
+    j = pos[1]
+
+    if j < 2:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i][j+1]
+        temp[i][j+1] = 0
+        return (temp)
+    else:
+        return (s)
+
+
+def left(s,pos):
+
+    i = pos[0]
+    j = pos[1]
+
+    if j > 0:
+        temp = copy.deepcopy(s)
+        temp[i][j] = temp[i][j-1]
+        temp[i][j-1] = 0
+        return (temp)
+    else:
+        return (s)
+
+def enqueue(s,val):
+    global q
+    q = q + [(val,s)]
+
+
+def g_val(s,curr_state):
+    d = 0
+    for i in range(3):
+        for j in range(3):
+            if s[i][j] != curr_state[i][j]:
+                d += 1
+    return d
+
+def h_val(g,curr_state):
+
+    d = 0
+    for i in range(3):
+        for j in range(3):
+            if curr_state[i][j] != g[i][j]:
+                d += 1
+    return d
+
+
+def heuristic_val(s,curr_state,g):
+    heur_val = g_val(s,curr_state) + h_val(g,curr_state)
+    return heur_val
+
+def dequeue(g,s):
+    global q
+    global visited
+    q.sort()
+    elem = q[0][1]
+    visited = visited + [q[0][1]]
+    del q[0]
+    return (elem)
+
+def search(s,g):
+    curr_state = copy.deepcopy(s)
+    if s == g:
         return
+    global visited
+    while(1):
+        pos = find_pos(curr_state)
+        new = up(curr_state,pos)
+        if new != curr_state:
+            if new == g:
+                print ("found!! The intermediate states are:")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new,heuristic_val(s,new,g))
 
-    # Check if the source and destination are unblocked
-    if not is_unblocked(grid, src[0], src[1]) or not is_unblocked(grid, dest[0], dest[1]):
-        print("Source or the destination is blocked")
-        return
+        new = down(curr_state,pos)
+        if new != curr_state:
+            if new == g:
+                print ("found!! The intermediate states are:")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new,heuristic_val(s,new,g))
 
-    # Check if we are already at the destination
-    if is_destination(src[0], src[1], dest):
-        print("We are already at the destination")
-        return
+        new = right(curr_state,pos)
+        if new != curr_state:
+            if new == g:
+                print ("found!! The intermediate states are:")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new,heuristic_val(s,new,g))
 
-    # Initialize the closed list (visited cells)
-    closed_list = [[False for _ in range(COL)] for _ in range(ROW)]
-    # Initialize the details of each cell
-    cell_details = [[Cell() for _ in range(COL)] for _ in range(ROW)]
+        new = left(curr_state,pos)
+        if new != curr_state:
+            if new == g:
+                print ("found!! The intermediate states are:")
+                print (visited + [g])
+                return
+            else:
+                if new not in visited:
+                    enqueue(new,heuristic_val(s,new,g))
 
-    # Initialize the start cell details
-    i = src[0]
-    j = src[1]
-    cell_details[i][j].f = 0
-    cell_details[i][j].g = 0
-    cell_details[i][j].h = 0
-    cell_details[i][j].parent_i = i
-    cell_details[i][j].parent_j = j
-
-    # Initialize the open list (cells to be visited) with the start cell
-    open_list = []
-    heapq.heappush(open_list, (0.0, i, j))
-
-    # Initialize the flag for whether destination is found
-    found_dest = False
-
-    # Main loop of A* search algorithm
-    while len(open_list) > 0:
-        # Pop the cell with the smallest f value from the open list
-        p = heapq.heappop(open_list)
-
-        # Mark the cell as visited
-        i = p[1]
-        j = p[2]
-        closed_list[i][j] = True
-
-        # For each direction, check the successors
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0),
-                      (1, 1), (1, -1), (-1, 1), (-1, -1)]
-        for dir in directions:
-            new_i = i + dir[0]
-            new_j = j + dir[1]
-
-            # If the successor is valid, unblocked, and not visited
-            if is_valid(new_i, new_j) and is_unblocked(grid, new_i, new_j) and not closed_list[new_i][new_j]:
-                # If the successor is the destination
-                if is_destination(new_i, new_j, dest):
-                    # Set the parent of the destination cell
-                    cell_details[new_i][new_j].parent_i = i
-                    cell_details[new_i][new_j].parent_j = j
-                    print("The destination cell is found")
-                    # Trace and print the path from source to destination
-                    trace_path(cell_details, dest)
-                    found_dest = True
-                    return
-                else:
-                    # Calculate the new f, g, and h values
-                    g_new = cell_details[i][j].g + 1.0
-                    h_new = calculate_h_value(new_i, new_j, dest)
-                    f_new = g_new + h_new
-
-                    # If the cell is not in the open list or the new f value is smaller
-                    if cell_details[new_i][new_j].f == float('inf') or cell_details[new_i][new_j].f > f_new:
-                        # Add the cell to the open list
-                        heapq.heappush(open_list, (f_new, new_i, new_j))
-                        # Update the cell details
-                        cell_details[new_i][new_j].f = f_new
-                        cell_details[new_i][new_j].g = g_new
-                        cell_details[new_i][new_j].h = h_new
-                        cell_details[new_i][new_j].parent_i = i
-                        cell_details[new_i][new_j].parent_j = j
-
-    # If the destination is not found after visiting all cells
-    if not found_dest:
-        print("Failed to find the destination cell")
-
-# Driver Code
+        if len(q) > 0:
+            curr_state = dequeue(g,s)
+        else:
+            print ("not found")
+            return
 
 
 def main():
-    # Define the grid (1 for unblocked, 0 for blocked)
-    grid = [
-        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
-        [1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
-        [1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
-        [0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
-        [1, 1, 1, 0, 1, 1, 1, 0, 1, 0],
-        [1, 0, 1, 1, 1, 1, 0, 1, 0, 0],
-        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 0, 0, 1]
-    ]
 
-    # Define the source and destination
-    src = [8, 0]
-    dest = [0, 0]
+    s = [[2,0,3],[1,8,4],[7,6,5]]
+    g = [[1,2,3],[8,0,4],[7,6,5]]
+    global q
+    global visited
+    q = q
+    visited = visited + [s]
 
-    # Run the A* search algorithm
-    a_star_search(grid, src, dest)
-
+    search(s,g)
 
 if __name__ == "__main__":
     main()
@@ -935,85 +1051,57 @@ if __name__ == "__main__":
 ==================================
 Ao *
 
-# Cost to find the AND and OR path
-def Cost(H, condition, weight = 1):
-    cost = {}
-    if 'AND' in condition:
-        AND_nodes = condition['AND']
-        Path_A = ' AND '.join(AND_nodes)
-        PathA = sum(H[node]+weight for node in AND_nodes)
-        cost[Path_A] = PathA
- 
-    if 'OR' in condition:
-        OR_nodes = condition['OR']
-        Path_B =' OR '.join(OR_nodes)
-        PathB = min(H[node]+weight for node in OR_nodes)
-        cost[Path_B] = PathB
-    return cost
- 
-# Update the cost
-def update_cost(H, Conditions, weight=1):
-    Main_nodes = list(Conditions.keys())
-    Main_nodes.reverse()
-    least_cost= {}
-    for key in Main_nodes:
-        condition = Conditions[key]
-        print(key,':', Conditions[key],'>>>', Cost(H, condition, weight))
-        c = Cost(H, condition, weight) 
-        H[key] = min(c.values())
-        least_cost[key] = Cost(H, condition, weight)            
-    return least_cost
- 
-# Print the shortest path
-def shortest_path(Start,Updated_cost, H):
-    Path = Start
-    if Start in Updated_cost.keys():
-        Min_cost = min(Updated_cost[Start].values())
-        key = list(Updated_cost[Start].keys())
-        values = list(Updated_cost[Start].values())
-        Index = values.index(Min_cost)
-         
-        # FIND MINIMIMUM PATH KEY
-        Next = key[Index].split()
-        # ADD TO PATH FOR OR PATH
-        if len(Next) == 1:
- 
-            Start =Next[0]
-            Path += ' = ' +shortest_path(Start, Updated_cost, H)
-        # ADD TO PATH FOR AND PATH
-        else:
-            Path +='=('+key[Index]+') '
- 
-            Start = Next[0]
-            Path += '[' +shortest_path(Start, Updated_cost, H) + ' + '
- 
-            Start = Next[-1]
-            Path +=  shortest_path(Start, Updated_cost, H) + ']'
- 
-    return Path
-         
- 
-# Heuristic values of Nodes  
-H1 = {'A': 1, 'B': 6, 'C': 2, 'D': 12, 'E': 2, 'F': 1, 'G': 5, 'H': 7, 'I': 7, 'J': 1, 'T': 3}
- 
- 
-Conditions = {
- 'A': {'OR': ['D'], 'AND': ['B', 'C']},
- 'B': {'OR': ['G', 'H']},
- 'C': {'OR': ['J']},
- 'D': {'AND': ['E', 'F']},
- 'G': {'OR': ['I']}
-    
-}
- 
-# weight
-weight = 1
-# Updated cost
-print('Updated Cost :')
-Updated_cost = update_cost(H1, Conditions, weight=1)
-print('*'*75)
-print('Shortest Path :\n',shortest_path('A', Updated_cost,H1))
+graph={'A':[['B', 'C'], ['D']],
+       'B':[['G'], ['H']],
+       'D':[['E','F']]}
 
+node_cost={'B':6, 'C':12, 'D':10, 'E':4, 'F':4, 'G':5, 'H':7}
+
+edge_cost=1
+
+head_node='A'
+
+def solve(currs):
+  flag=0
+  for curr in currs:
+    if curr in graph.keys():
+      flag=1
+
+  if not flag:
+    return 0
+
+  min_cost=1000000
+  for curr in currs:
+    if curr in graph.keys():
+      for path in graph[curr]:
+        cost=0
+        for node in path:
+          cost=cost + node_cost[node]+edge_cost
+          if min_cost>cost:
+            min_cost=cost
+            next_nodes=path
+  print(f"{next_nodes}, {min_cost}")
+  return [next_nodes, min_cost]
+
+
+def driver():
+  cost=0
+  curr = head_node
+  moves=0
+  while True:
+    for node in curr:
+      result=solve(node)
+      if not result:
+        print(f"moves:{moves}")
+        print(f"cost:{cost}")
+        return cost
+      cost += result[1]
+      curr = result[0]
+    moves += 1
+
+
+if __name__=="__main__":
+  driver()
 
 
 
