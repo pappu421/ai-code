@@ -481,7 +481,7 @@ from sklearn import neighbors
 import pylab as pl
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-iris = datasets.load_iris()
+iris = datasets.load_iris()                  
 print(iris.keys())
 n_samples, n_features = iris.data.shape
 print((n_samples, n_features))
@@ -530,6 +530,13 @@ def plot_iris_knn():
     pl.ylabel('sepal width (cm)')
     pl.axis('tight')
 plot_iris_knn()
+
+============================================== csv file knn
+
+from google.colab import files
+upload = files.upload()
+
+
 =============================
 NAÏVE BAYES
 from sklearn.datasets import load_iris
