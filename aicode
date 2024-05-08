@@ -333,193 +333,82 @@ if __name__ == "__main__":
 
 ==================================
 HILL CLIMB
-import sys
-import copy
-
-curr_min = sys.maxsize
-q = []
-visited = []
-
-def compare(s,g):
-    if s==g:
-        return(1)
-    else:
-        return(0)
-
-def find_pos(s):
-
-    for i in range(3):
-        for j in range(3):
-            if s[i][j] == 0:
-                return([i,j])
-
-
-def up(s,pos):
-
-    i = pos[0]
-    j = pos[1]
-
-    if i > 0:
-        temp = copy.deepcopy(s)
-        temp[i][j] = temp[i-1][j]
-        temp[i-1][j] = 0
-        return (temp)
-    else:
-        return (s)
-
-
-def down(s,pos):
-
-    i = pos[0]
-    j = pos[1]
-
-    if i < 2:
-        temp = copy.deepcopy(s)
-        temp[i][j] = temp[i+1][j]
-        temp[i+1][j] = 0
-        return (temp)
-    else:
-        return (s)
-
-
-def right(s,pos):
-
-    i = pos[0]
-    j = pos[1]
-
-    if j < 2:
-        temp = copy.deepcopy(s)
-        temp[i][j] = temp[i][j+1]
-        temp[i][j+1] = 0
-        return (temp)
-    else:
-        return (s)
-
-
-def left(s,pos):
-
-    i = pos[0]
-    j = pos[1]
-
-    if j > 0:
-        temp = copy.deepcopy(s)
-        temp[i][j] = temp[i][j-1]
-        temp[i][j-1] = 0
-        return (temp)
-    else:
-        return (s)
-
-def enqueue(s):
-    global q
-    q = q + [s]
-
-def heuristic(s,g):
-    d = 0
-    for i in range(len(s)):
-        for j in range(len(s[0])):
-            if s[i][j] != g[i][j]:
-                d += 1
-    return d
-
-
-def dequeue(g):
-
-    h = []
-    global q
-    global visited
-    global curr_min
-
-    for i in range(len(q)):
-        h = h + [heuristic(q[i],g)]
-
-    if min(h) < curr_min:
-        curr_min = min(h)
-        index = h.index(min(h))
-        visited = visited + [q[index]]
-        elem = q[index]
-        q = []
-        return (elem)
-    else:
-        print ("optimal solution found !! The intermediate states are: ")
-        print (visited)
-        exit()
-
-
-
-
-def search(s,g):
-
-    curr_state = copy.deepcopy(s)
-    if s == g:
-        return
-
-    global visited
-    while(1):
-
-        pos = find_pos(curr_state)
-        new = up(curr_state,pos)
-
-        if new != curr_state:
-            if new == g:
-                print ("Goal State found !! The intermediate States are :")
-                print (visited + [g])
-                return
-            else:
-                if new not in visited:
-                    enqueue(new)
-
-
-        new = down(curr_state,pos)
-
-        if new != curr_state:
-            if new == g:
-                print ("Goal State found !! The intermediate States are :")
-                print (visited + [g])
-                return
-            else:
-                if new not in visited:
-                    enqueue(new)
-
-        new = right(curr_state,pos)
-
-        if new != curr_state:
-            if new == g:
-                print ("Goal State found !! The intermediate States are :")
-                print (visited + [g])
-                return
-            else:
-                if new not in visited:
-                    enqueue(new)
-
-        new = left(curr_state,pos)
-
-        if new != curr_state:
-            if new == g:
-                print ("Goal State found !! The intermediate States are :")
-                print (visited + [g])
-                return
-            else:
-                if new not in visited:
-                    enqueue(new)
-
-        if len(q) > 0:
-            curr_state = dequeue(g)
-        else:
-            print ("not found")
-            return
-
-
-def main():
-    s = [[2,8,3],[1,5,4],[7,6,0]]
-    g = [[1,2,7],[8,0,5],[3,4,6]]
-    global q
-    global visited
-    q = q + [s]
-    visited = visited + [s]
-    search(s,g)
-
-if __name__ == "__main__":
-    main()
+import random
+import numpy as np
+import networkx as nx
+ 
+#coordinate of the points/cities
+coordinate = np.array([[1,2], [30,21], [56,23], [8,18], [20,50], [3,4], [11,6], [6,7], [15,20], [10,9], [12,12]])
+ 
+#adjacency matrix for a weighted graph based on the given coordinates
+def generate_matrix(coordinate):
+    matrix = []
+    for i in range(len(coordinate)):
+        for j in range(len(coordinate)) :       
+            p = np.linalg.norm(coordinate[i] - coordinate[j])
+            matrix.append(p)
+    matrix = np.reshape(matrix, (len(coordinate),len(coordinate)))
+    #print(matrix)
+    return matrix
+ 
+#finds a random solution    
+def solution(matrix):
+    points = list(range(0, len(matrix)))
+    solution = []
+    for i in range(0, len(matrix)):
+        random_point = points[random.randint(0, len(points) - 1)]
+        solution.append(random_point)
+        points.remove(random_point)
+    return solution
+ 
+ 
+#calculate the path based on the random solution
+def path_length(matrix, solution):
+    cycle_length = 0
+    for i in range(0, len(solution)):
+        cycle_length += matrix[solution[i]][solution[i - 1]]
+    return cycle_length
+ 
+#generate neighbors of the random solution by swapping cities and returns the best neighbor
+def neighbors(matrix, solution):
+    neighbors = []
+    for i in range(len(solution)):
+        for j in range(i + 1, len(solution)):
+            neighbor = solution.copy()
+            neighbor[i] = solution[j]
+            neighbor[j] = solution[i]
+            neighbors.append(neighbor)
+             
+    #assume that the first neighbor in the list is the best neighbor      
+    best_neighbor = neighbors[0]
+    best_path = path_length(matrix, best_neighbor)
+     
+    #check if there is a better neighbor
+    for neighbor in neighbors:
+        current_path = path_length(matrix, neighbor)
+        if current_path < best_path:
+            best_path = current_path
+            best_neighbor = neighbor
+    return best_neighbor, best_path
+ 
+ 
+def hill_climbing(coordinate):
+    matrix = generate_matrix(coordinate)
+     
+    current_solution = solution(matrix)
+    current_path = path_length(matrix, current_solution)
+    neighbor = neighbors(matrix,current_solution)[0]
+    best_neighbor, best_neighbor_path = neighbors(matrix, neighbor)
+ 
+    while best_neighbor_path < current_path:
+        current_solution = best_neighbor
+        current_path = best_neighbor_path
+        neighbor = neighbors(matrix, current_solution)[0]
+        best_neighbor, best_neighbor_path = neighbors(matrix, neighbor)
+ 
+    return current_path, current_solution
+final_solution = hill_climbing(coordinate)
+print("The solution is \n", final_solution[1])
 
 
 
